@@ -1,6 +1,6 @@
 package com.kadry.blog.Services;
 
-import com.kadry.blog.Services.Imp.RegisterServiceImp;
+import com.kadry.blog.Services.Imp.UserServiceImp;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
@@ -11,9 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.util.Optional;
@@ -24,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RegisterServiceTest {
+public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
@@ -33,11 +31,11 @@ public class RegisterServiceTest {
     AuthorityRepository authorityRepository;
 
 
-    RegisterService registerService;
+    UserService userService;
 
     @Before
     public void setUp() throws Exception {
-     registerService = new RegisterServiceImp(userRepository, authorityRepository, new BCryptPasswordEncoder());
+     userService = new UserServiceImp(userRepository, authorityRepository, new BCryptPasswordEncoder());
     }
 
     @Test
@@ -52,7 +50,7 @@ public class RegisterServiceTest {
         userDto.setFirstName("test_firstname");
         userDto.setLastName("test_lastname");
 
-        registerService.registerNewUser(userDto);
+        userService.registerNewUser(userDto);
 
         verify(userRepository).save(any(User.class));
     }

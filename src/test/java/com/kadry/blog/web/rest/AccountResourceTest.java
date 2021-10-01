@@ -1,7 +1,7 @@
 package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
-import com.kadry.blog.Services.RegisterService;
+import com.kadry.blog.Services.UserService;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import org.junit.jupiter.api.Test;
@@ -16,25 +16,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import static com.kadry.blog.TestUtils.asJsonString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(RegisterResource.class)
-class RegisterResourceTest {
+@WebMvcTest(AccountResource.class)
+class AccountResourceTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    RegisterService registerService;
+    UserService userService;
 
     @MockBean
     MailService mailService;
 
     @Test
     void testRegisterNewUser() throws Exception {
+
+        when(userService.registerNewUser(any(UserDto.class))).thenReturn(new User());
+
         UserDto userDto = new UserDto("test_username",
                 "test_password",
                 "test@testdomain.com",
@@ -48,7 +52,7 @@ class RegisterResourceTest {
                 .content(asJsonString(userDto)))
                 .andExpect(status().isCreated());
 
-        verify(registerService).registerNewUser(any(UserDto.class));
+        verify(userService).registerNewUser(any(UserDto.class));
         verify(mailService).sendActivationMail(any(User.class));
 
     }

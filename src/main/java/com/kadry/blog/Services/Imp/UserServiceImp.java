@@ -1,7 +1,7 @@
 package com.kadry.blog.Services.Imp;
 
 import com.kadry.blog.Services.EmailAlreadyUsedException;
-import com.kadry.blog.Services.RegisterService;
+import com.kadry.blog.Services.UserService;
 import com.kadry.blog.Services.UsernameAlreadyUsedException;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.mapper.UserMapper;
@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class RegisterServiceImp implements RegisterService {
+public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    public RegisterServiceImp(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImp(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
