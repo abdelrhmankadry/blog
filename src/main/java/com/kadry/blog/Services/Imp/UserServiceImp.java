@@ -65,7 +65,6 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    @Transactional
     public void activateUser(String activationKey) throws InvalidActivationKey{
         Optional<User> optionalUser = userRepository.findUserByActivationKey(activationKey);
         if(! optionalUser.isPresent()){
@@ -74,6 +73,7 @@ public class UserServiceImp implements UserService {
 
         optionalUser.ifPresent(user -> {
             user.setActivated(true);
+            userRepository.save(user);
         });
     }
 
