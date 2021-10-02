@@ -6,6 +6,8 @@ import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,9 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.kadry.blog.TestUtils.asJsonString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +35,7 @@ class AccountResourceTest {
 
     @MockBean
     MailService mailService;
+
 
     @Test
     void testRegisterNewUser() throws Exception {
@@ -72,5 +75,13 @@ class AccountResourceTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void testActivateAccount() throws Exception {
+        String activationKey = "test activation key";
 
+        mockMvc.perform(get("/api/activate?key={activationKey}", activationKey))
+                .andExpect(status().isOk());
+
+        verify(userService).activateUser(activationKey);
+    }
 }

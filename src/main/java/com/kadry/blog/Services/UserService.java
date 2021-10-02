@@ -5,4 +5,6 @@ import com.kadry.blog.model.User;
 
 public interface UserService {
      User registerNewUser(UserDto userDto);
+
+     void activateUser(String activationKey);
 }

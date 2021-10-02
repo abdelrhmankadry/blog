@@ -13,8 +13,10 @@ import com.kadry.blog.security.AuthoritiesConstants;
 import com.kadry.blog.security.RandomUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -60,6 +62,19 @@ public class UserServiceImp implements UserService {
         user.setAuthorities(authorities);
 
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void activateUser(String activationKey) throws InvalidActivationKey{
+        Optional<User> optionalUser = userRepository.findUserByActivationKey(activationKey);
+        if(! optionalUser.isPresent()){
+            throw new InvalidActivationKey();
+        }
+
+        optionalUser.ifPresent(user -> {
+            user.setActivated(true);
+        });
     }
 
     private boolean removeNonActivatedUser(User existingUser) {

@@ -27,4 +27,9 @@ public class AccountResource {
         mailService.sendActivationMail(user);
     }
 
+    @GetMapping("/activate")
+    public void activateAccount(@RequestParam(value = "key") String key){
+        userService.activateUser(key);
+    }
+
 }

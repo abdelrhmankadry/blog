@@ -1,6 +1,7 @@
 package com.kadry.blog;
 
 import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.model.User;
 import com.kadry.blog.repositories.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RegistrationIT {
 
-    public static final String TEST_USERNAME = "test_username";
+    private static final String TEST_USERNAME = "test_username";
+    private static final String TEST_ACTIVATION_KEY = "test_activation_key";
+    private static final String BASE_URL = "http://127.0.0.1:8080";
     @Autowired
     UserRepository userRepository;
 
@@ -41,10 +44,33 @@ public class RegistrationIT {
         userDTO.setFirstName("test_firstname");
         userDTO.setLastName("test_lastname");
 
-        ResponseEntity<String> response = testRestTemplate.postForEntity("http://127.0.0.1:8080/api/register", userDTO, String.class);
+        ResponseEntity<String> response = testRestTemplate.postForEntity(BASE_URL+"/api/register",
+                userDTO, String.class);
 
         assertEquals(response.getStatusCode(), HttpStatus.CREATED);
 
         assertTrue(userRepository.findUserByUsername(TEST_USERNAME).isPresent());
+    }
+
+    @Test
+    public void testActivateAccount() {
+        User user = new User();
+        user.setUsername(TEST_USERNAME);
+        user.setPassword("test_password");
+        user.setActivationKey(TEST_ACTIVATION_KEY);
+        user.setActivated(false);
+
+        userRepository.save(user);
+
+        ResponseEntity<String> response = testRestTemplate.getForEntity(BASE_URL+"/api/activate?key="+TEST_ACTIVATION_KEY,
+                String.class);
+
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        userRepository.findUserByUsername(TEST_USERNAME).ifPresent(returnedUser ->{
+            assertTrue(returnedUser.isActivated());
+        });
+
+
     }
 }

@@ -42,6 +42,7 @@ public class User {
 
     @Column(nullable = false)
     boolean activated = false;
+
     @Column(name = "activation_key", length = 20)
     String activationKey;
 
