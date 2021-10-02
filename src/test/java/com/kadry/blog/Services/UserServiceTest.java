@@ -10,6 +10,8 @@ import com.kadry.blog.repositories.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +21,7 @@ import java.util.Optional;
 
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -34,6 +37,8 @@ public class UserServiceTest {
     @Mock
     AuthorityRepository authorityRepository;
 
+    @Captor
+    ArgumentCaptor<User> captor;
 
     UserService userService;
 
@@ -64,6 +69,8 @@ public class UserServiceTest {
         when(userRepository.findUserByActivationKey(anyString())).thenReturn(Optional.of(new User()));
         userService.activateUser(TEST_ACTIVATION_KEY);
         verify(userRepository).findUserByActivationKey(TEST_ACTIVATION_KEY);
+        verify(userRepository).save(captor.capture());
+        assertTrue(captor.getValue().isActivated());
     }
 
     @Test(expected = InvalidActivationKey.class)
