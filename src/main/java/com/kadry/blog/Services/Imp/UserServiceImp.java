@@ -7,14 +7,15 @@ import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.mapper.UserMapper;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
+import com.kadry.blog.payload.KeyAndPassword;
 import com.kadry.blog.repositories.AuthorityRepository;
 import com.kadry.blog.repositories.UserRepository;
 import com.kadry.blog.security.AuthoritiesConstants;
 import com.kadry.blog.security.RandomUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -75,6 +76,31 @@ public class UserServiceImp implements UserService {
             user.setActivated(true);
             userRepository.save(user);
         });
+    }
+
+    @Override
+    public Optional<User> resetPasswordInit(String email) {
+        Optional<User> userOptional = userRepository.findUserByEmail(email);
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
+            if (user.isActivated()) {
+                user.setResetDate(Instant.now());
+                user.setResetKey(RandomUtil.generateResetKey());
+                userRepository.save(user);
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void resetPasswordFinal(KeyAndPassword keyAndPassword) {
+
+        userRepository.findUserByResetKey(keyAndPassword.getKey()).ifPresentOrElse(user -> {
+            user.setPassword(keyAndPassword.getPassword());
+            userRepository.save(user);
+        },
+                ()-> {throw new InvalidResetKey();});
     }
 
     private boolean removeNonActivatedUser(User existingUser) {

@@ -12,4 +12,6 @@ public class RandomUtil {
     }
 
     public static String generateActivationKey(){return generateRandomAlphanumericString();}
+
+    public static String generateResetKey(){return generateRandomAlphanumericString();}
 }

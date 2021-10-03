@@ -18,7 +18,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.POST,"/api/register").permitAll();
+                .mvcMatchers("/api/**").authenticated()
+                .mvcMatchers(HttpMethod.POST,"/api/register").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/api/activate").permitAll()
+                .mvcMatchers(HttpMethod.POST,"/api/account/reset-password/**").permitAll();
+
+
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Bean

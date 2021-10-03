@@ -4,6 +4,7 @@ import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
+import com.kadry.blog.payload.KeyAndPassword;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,16 @@ public class AccountResource {
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key){
         userService.activateUser(key);
+    }
+
+    @PostMapping("/account/reset-password/init")
+    public void resetPasswordInit(@RequestBody String email){
+        userService.resetPasswordInit(email).ifPresent(mailService::sendResetPasswordMail);
+    }
+
+    @PostMapping("/account/reset-password/final")
+    public void resetPasswordFinal(@Valid @RequestBody KeyAndPassword keyAndPassword){
+        userService.resetPasswordFinal(keyAndPassword);
     }
 
 }

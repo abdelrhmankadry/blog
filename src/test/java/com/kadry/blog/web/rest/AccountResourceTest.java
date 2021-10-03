@@ -4,6 +4,7 @@ import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
+import com.kadry.blog.payload.KeyAndPassword;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
 
 import static com.kadry.blog.TestUtils.asJsonString;
 import static org.mockito.ArgumentMatchers.*;
@@ -69,7 +72,7 @@ class AccountResourceTest {
                 "test-firstname",
                 "test-lastname");
 
-        mockMvc.perform(post("/api/register", userDto)
+        mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userDto)))
                 .andExpect(status().isBadRequest());
@@ -83,5 +86,33 @@ class AccountResourceTest {
                 .andExpect(status().isOk());
 
         verify(userService).activateUser(activationKey);
+    }
+
+    @Test
+    void testResetPasswordInit() throws Exception {
+        when(userService.resetPasswordInit(anyString())).thenReturn(Optional.of(new User()));
+
+        mockMvc.perform(post("/api/account/reset-password/init")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("test@domain.com"))
+                .andExpect(status().isOk());
+
+        verify(userService).resetPasswordInit(anyString());
+        verify(mailService).sendResetPasswordMail(any(User.class));
+    }
+
+    @Test
+    void testResetPasswordFinal() throws Exception {
+
+        KeyAndPassword keyAndPassword = new KeyAndPassword();
+        keyAndPassword.setPassword("test-password");
+        keyAndPassword.setKey("test-key");
+
+        mockMvc.perform(post("/api/account/reset-password/final")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(keyAndPassword)))
+                .andExpect(status().isOk());
+
+        verify(userService).resetPasswordFinal(any(KeyAndPassword.class));
     }
 }

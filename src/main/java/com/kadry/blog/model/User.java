@@ -47,7 +47,7 @@ public class User {
     String activationKey;
 
     @Column(name = "reset_key", length = 20)
-    String restKey;
+    String resetKey;
 
     @Column(name = "reset_date")
     Instant resetDate = null;

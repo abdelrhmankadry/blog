@@ -1,10 +1,12 @@
 package com.kadry.blog.Services;
 
 import com.kadry.blog.Services.Imp.InvalidActivationKey;
+import com.kadry.blog.Services.Imp.InvalidResetKey;
 import com.kadry.blog.Services.Imp.UserServiceImp;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
+import com.kadry.blog.payload.KeyAndPassword;
 import com.kadry.blog.repositories.AuthorityRepository;
 import com.kadry.blog.repositories.UserRepository;
 import org.junit.Before;
@@ -20,8 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -76,5 +77,47 @@ public class UserServiceTest {
     @Test(expected = InvalidActivationKey.class)
     public void testActivateUserWithInvalidActivationUser() {
         userService.activateUser(TEST_ACTIVATION_KEY);
+    }
+
+    @Test
+    public void testResetPasswordInit() {
+        User user = new User();
+        user.setActivated(true);
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(user));
+
+        Optional<User> returnedUser = userService.resetPasswordInit("test@domain.com");
+
+        assertNotNull(returnedUser.get().getResetDate());
+        assertNotNull(returnedUser.get().getResetKey());
+    }
+
+    @Test
+    public void testResetPasswordFinal() {
+        final String TEST_RESET_KEY = "test-reset-key";
+        final String NEW_PASSWORD = "new-test-password";
+        User user = new User();
+        user.setPassword("test-password");
+        user.setResetKey(TEST_RESET_KEY);
+        when(userRepository.findUserByResetKey(anyString())).thenReturn(Optional.of(user));
+
+        KeyAndPassword keyAndPassword = new KeyAndPassword();
+        keyAndPassword.setKey(TEST_RESET_KEY);
+        keyAndPassword.setPassword(NEW_PASSWORD);
+
+        userService.resetPasswordFinal(keyAndPassword);
+
+        verify(userRepository).save(captor.capture());
+        assertEquals(NEW_PASSWORD, captor.getValue().getPassword());
+    }
+
+    @Test(expected = InvalidResetKey.class)
+    public void testResetPasswordFinalWithInvalidKey() {
+        when(userRepository.findUserByResetKey(anyString())).thenReturn(Optional.empty());
+        KeyAndPassword keyAndPassword = new KeyAndPassword();
+        keyAndPassword.setKey("test-key");
+        keyAndPassword.setPassword("test-password");
+
+        userService.resetPasswordFinal(keyAndPassword);
     }
 }
