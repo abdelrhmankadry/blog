@@ -1,7 +1,7 @@
 package com.kadry.blog.Services;
 
-import com.kadry.blog.Services.Imp.InvalidActivationKey;
-import com.kadry.blog.Services.Imp.InvalidResetKey;
+import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
+import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.Services.Imp.UserServiceImp;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.Authority;
@@ -74,7 +74,7 @@ public class UserServiceTest {
         assertTrue(captor.getValue().isActivated());
     }
 
-    @Test(expected = InvalidActivationKey.class)
+    @Test(expected = InvalidActivationKeyException.class)
     public void testActivateUserWithInvalidActivationUser() {
         userService.activateUser(TEST_ACTIVATION_KEY);
     }
@@ -111,7 +111,7 @@ public class UserServiceTest {
         assertEquals(NEW_PASSWORD, captor.getValue().getPassword());
     }
 
-    @Test(expected = InvalidResetKey.class)
+    @Test(expected = InvalidResetKeyException.class)
     public void testResetPasswordFinalWithInvalidKey() {
         when(userRepository.findUserByResetKey(anyString())).thenReturn(Optional.empty());
         KeyAndPassword keyAndPassword = new KeyAndPassword();

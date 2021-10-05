@@ -1,4 +1,4 @@
-package com.kadry.blog;
+package com.kadry.blog.integration_tests;
 
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
@@ -13,7 +13,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class AccountResourceIT {
 
     private static final String TEST_USERNAME = "test_username";

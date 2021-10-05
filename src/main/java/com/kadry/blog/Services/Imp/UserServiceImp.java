@@ -1,8 +1,10 @@
 package com.kadry.blog.Services.Imp;
 
-import com.kadry.blog.Services.EmailAlreadyUsedException;
+import com.kadry.blog.Services.exceptions.EmailAlreadyUsedException;
 import com.kadry.blog.Services.UserService;
-import com.kadry.blog.Services.UsernameAlreadyUsedException;
+import com.kadry.blog.Services.exceptions.UsernameAlreadyUsedException;
+import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
+import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.mapper.UserMapper;
 import com.kadry.blog.model.Authority;
@@ -66,10 +68,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void activateUser(String activationKey) throws InvalidActivationKey{
+    public void activateUser(String activationKey) throws InvalidActivationKeyException {
         Optional<User> optionalUser = userRepository.findUserByActivationKey(activationKey);
         if(! optionalUser.isPresent()){
-            throw new InvalidActivationKey();
+            throw new InvalidActivationKeyException();
         }
 
         optionalUser.ifPresent(user -> {
@@ -100,7 +102,7 @@ public class UserServiceImp implements UserService {
             user.setPassword(keyAndPassword.getPassword());
             userRepository.save(user);
         },
-                ()-> {throw new InvalidResetKey();});
+                ()-> {throw new InvalidResetKeyException();});
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
