@@ -42,6 +42,7 @@ public class DomainUserDetailsServiceTest {
         user.setUsername(TEST_USERNAME);
         user.setPassword("test-password");
         user.setAuthorities(Set.of(new Authority(AuthoritiesConstants.USER)));
+        user.setActivated(true);
 
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user));
 

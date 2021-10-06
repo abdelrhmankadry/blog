@@ -4,6 +4,7 @@ package com.kadry.blog.security.jwt;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -12,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -33,12 +36,11 @@ public class JwtFilter extends OncePerRequestFilter {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             response.setStatus(HttpStatus.OK.value());
-        } else{
-             response.setStatus(HttpStatus.FORBIDDEN.value());
-         }
+        }
         filterChain.doFilter(request, response);
 
     }
+
 
     private String resolveToken(String header) {
         if(StringUtils.hasText(header) && header.startsWith("Bearer ")){
@@ -46,4 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+
 }
+

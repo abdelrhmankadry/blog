@@ -29,13 +29,12 @@ public class UserJwtController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<JwtToken> authenticate(@Valid @RequestBody LoginVM loginVM){
+    public ResponseEntity<JwtToken> authenticate(@Valid @RequestBody LoginVM loginVM) {
         Authentication authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("I am authenticated !!");
         String token = tokenProvider.generateToken(authentication);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + token);

@@ -5,14 +5,16 @@ import com.kadry.blog.Services.UserService;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,7 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AccountResource.class)
-class AccountResourceTest {
+@ComponentScan({"com.kadry.blog.security.jwt"})
+public class AccountResourceTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -41,7 +44,7 @@ class AccountResourceTest {
 
 
     @Test
-    void testRegisterNewUser() throws Exception {
+    public void testRegisterNewUser() throws Exception {
 
         when(userService.registerNewUser(any(UserDto.class))).thenReturn(new User());
 
@@ -65,7 +68,7 @@ class AccountResourceTest {
 
 
     @Test
-    void testRegisterNewUserWithInvalidUsername() throws Exception {
+    public void testRegisterNewUserWithInvalidUsername() throws Exception {
         UserDto userDto = new UserDto("test  username",
                 "test_password",
                 "test@testdomain.com",
@@ -79,7 +82,7 @@ class AccountResourceTest {
     }
 
     @Test
-    void testActivateAccount() throws Exception {
+    public void testActivateAccount() throws Exception {
         String activationKey = "test activation key";
 
         mockMvc.perform(get("/api/activate?key={activationKey}", activationKey))
@@ -89,7 +92,7 @@ class AccountResourceTest {
     }
 
     @Test
-    void testResetPasswordInit() throws Exception {
+    public void testResetPasswordInit() throws Exception {
         when(userService.resetPasswordInit(anyString())).thenReturn(Optional.of(new User()));
 
         mockMvc.perform(post("/api/account/reset-password/init")
@@ -102,7 +105,7 @@ class AccountResourceTest {
     }
 
     @Test
-    void testResetPasswordFinal() throws Exception {
+    public void testResetPasswordFinal() throws Exception {
 
         KeyAndPassword keyAndPassword = new KeyAndPassword();
         keyAndPassword.setPassword("test-password");

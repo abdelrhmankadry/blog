@@ -55,15 +55,4 @@ public class JwtFilterTest {
         verify(tokenProvider).validate(anyString());
     }
 
-    @Test
-     public void testJwtFilterWithInvalidJwt() throws ServletException, IOException {
-        when(tokenProvider.validate(anyString())).thenReturn(false);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader("Authorization", "Bearer test-jwt");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        MockFilterChain filterChain = new MockFilterChain();
-        jwtFilter.doFilter(request, response, filterChain);
-
-        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
-    }
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-
+@Component
 public class DomainUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
