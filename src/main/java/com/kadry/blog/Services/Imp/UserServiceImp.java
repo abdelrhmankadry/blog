@@ -18,8 +18,10 @@ import com.kadry.blog.security.RandomUtil;
 import com.kadry.blog.security.SecurityUtils;
 import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -122,6 +124,14 @@ public class UserServiceImp implements UserService {
                 throw new BadCredentialsException("Invalid current password!");
             }
         });
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserAccount() {
+        String currentUsername = SecurityUtils.getCurrentUserLogin()
+                .orElseThrow(UnAuthenticatedAccessException::new);
+        userRepository.deleteUserByUsername(currentUsername);
     }
 
     private boolean removeNonActivatedUser(User existingUser) {

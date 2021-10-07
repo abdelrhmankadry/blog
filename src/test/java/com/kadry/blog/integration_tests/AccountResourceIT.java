@@ -25,8 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.kadry.blog.TestUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -39,7 +38,6 @@ public class AccountResourceIT {
     public static final String NEW_TEST_PASSWORD = "new_test_password";
     private static final String TEST_USERNAME = "test_username";
     private static final String TEST_ACTIVATION_KEY = "test_activation_key";
-    private static final String BASE_URL = "http://127.0.0.1:8080";
     private static final String TEST_PASSWORD = "test_password";
     private static final String TEST_EMAIL = "test_email@testdomain.com";
     @Autowired
@@ -147,5 +145,20 @@ public class AccountResourceIT {
 
         assertTrue(passwordEncoder.matches(TEST_NEW_PASSWORD,
                 userRepository.findUserByUsername(TEST_USERNAME).get().getPassword()));
+    }
+
+    @Test
+    @WithMockUser(TEST_USERNAME)
+    public void deleteUserAccount() throws Exception {
+        User user = new User();
+        user.setUsername(TEST_USERNAME);
+        user.setPassword(TEST_PASSWORD);
+
+        userRepository.save(user);
+
+        mockMvc.perform(delete("/api/account/delete"))
+                .andExpect(status().isOk());
+
+        assertNull(userRepository.findUserByUsername(TEST_USERNAME).orElse(null));
     }
 }

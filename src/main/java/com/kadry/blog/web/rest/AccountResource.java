@@ -48,4 +48,9 @@ public class AccountResource {
     public void changePassword(@Valid @RequestBody PasswordChangedDto passwordChangedDto){
         userService.changePassword(passwordChangedDto);
     }
+
+    @DeleteMapping("account/delete")
+    public void deleteUserAccount(){
+        userService.deleteUserAccount();;
+    }
 }

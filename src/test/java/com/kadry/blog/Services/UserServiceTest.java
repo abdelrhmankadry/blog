@@ -18,12 +18,10 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
-import javax.naming.AuthenticationException;
 import java.util.Optional;
 
 
@@ -44,7 +42,10 @@ public class UserServiceTest {
     AuthorityRepository authorityRepository;
 
     @Captor
-    ArgumentCaptor<User> captor;
+    ArgumentCaptor<User> userCaptor;
+
+    @Captor
+    ArgumentCaptor<String> stringCaptor;
 
     UserService userService;
 
@@ -77,8 +78,8 @@ public class UserServiceTest {
         when(userRepository.findUserByActivationKey(anyString())).thenReturn(Optional.of(new User()));
         userService.activateUser(TEST_ACTIVATION_KEY);
         verify(userRepository).findUserByActivationKey(TEST_ACTIVATION_KEY);
-        verify(userRepository).save(captor.capture());
-        assertTrue(captor.getValue().isActivated());
+        verify(userRepository).save(userCaptor.capture());
+        assertTrue(userCaptor.getValue().isActivated());
     }
 
     @Test(expected = InvalidActivationKeyException.class)
@@ -114,8 +115,8 @@ public class UserServiceTest {
 
         userService.resetPasswordFinal(keyAndPassword);
 
-        verify(userRepository).save(captor.capture());
-        assertEquals(NEW_PASSWORD, captor.getValue().getPassword());
+        verify(userRepository).save(userCaptor.capture());
+        assertEquals(NEW_PASSWORD, userCaptor.getValue().getPassword());
     }
 
     @Test(expected = InvalidResetKeyException.class)
@@ -147,8 +148,8 @@ public class UserServiceTest {
 
         userService.changePassword(passwordChangedDto);
 
-        verify(userRepository).save(captor.capture());
-        User passedUser = captor.getValue();
+        verify(userRepository).save(userCaptor.capture());
+        User passedUser = userCaptor.getValue();
         assertTrue(passwordEncoder.matches(TEST_NEW_PASSWORD, passedUser.getPassword()));
     }
 
@@ -176,5 +177,18 @@ public class UserServiceTest {
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.empty());
 
         userService.changePassword(new PasswordChangedDto());
+    }
+
+    @Test
+    public void deleteUserAccount() {
+
+        mockStatic(SecurityUtils.class);
+        when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
+        userService.deleteUserAccount();
+
+        verify(userRepository).deleteUserByUsername(stringCaptor.capture());
+
+        assertEquals("test-username", stringCaptor.getValue());
+
     }
 }

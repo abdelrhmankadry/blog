@@ -2,6 +2,7 @@ package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
+import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import com.kadry.blog.dto.PasswordChangedDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
@@ -26,8 +27,7 @@ import java.util.Optional;
 import static com.kadry.blog.TestUtils.asJsonString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -133,5 +133,22 @@ public class AccountResourceTest {
                                     .content(asJsonString(passwordChangedDto)))
                                     .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void testChangePasswordWithoutAuthentication() throws Exception {
+        mockMvc.perform(post("/api/account/change-password")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(new PasswordChangedDto())))
+                            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser("test-user")
+    public void testDeleteUserAccount() throws Exception {
+        mockMvc.perform(delete("/api/account/delete"))
+                .andExpect(status().isOk());
+
+        verify(userService).deleteUserAccount();
     }
 }

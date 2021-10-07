@@ -18,4 +18,6 @@ public interface UserService {
      void resetPasswordFinal(KeyAndPassword keyAndPassword);
 
      void changePassword(PasswordChangedDto passwordChangedDto);
+
+     void deleteUserAccount();
 }
