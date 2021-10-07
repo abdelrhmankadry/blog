@@ -2,6 +2,7 @@ package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
+import com.kadry.blog.dto.PasswordChangedDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
@@ -43,4 +44,8 @@ public class AccountResource {
         userService.resetPasswordFinal(keyAndPassword);
     }
 
+    @PostMapping("/account/change-password")
+    public void changePassword(@Valid @RequestBody PasswordChangedDto passwordChangedDto){
+        userService.changePassword(passwordChangedDto);
+    }
 }

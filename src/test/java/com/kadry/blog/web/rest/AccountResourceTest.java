@@ -2,9 +2,11 @@ package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
+import com.kadry.blog.dto.PasswordChangedDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
+import com.kadry.blog.security.AuthoritiesConstants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -117,5 +120,18 @@ public class AccountResourceTest {
                 .andExpect(status().isOk());
 
         verify(userService).resetPasswordFinal(any(KeyAndPassword.class));
+    }
+
+    @Test
+    @WithMockUser("test-current-password")
+    public void testChangePassword() throws Exception {
+        PasswordChangedDto passwordChangedDto = new PasswordChangedDto();
+        passwordChangedDto.setCurrentPassword("test-current-password");
+        passwordChangedDto.setNewPassword("test-new-password");
+        mockMvc.perform(post("/api/account/change-password")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(asJsonString(passwordChangedDto)))
+                                    .andExpect(status().isOk());
+
     }
 }

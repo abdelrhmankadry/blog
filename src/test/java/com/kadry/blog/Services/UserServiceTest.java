@@ -3,22 +3,27 @@ package com.kadry.blog.Services;
 import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
 import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.Services.Imp.UserServiceImp;
+import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
+import com.kadry.blog.dto.PasswordChangedDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
 import com.kadry.blog.repositories.AuthorityRepository;
 import com.kadry.blog.repositories.UserRepository;
+import com.kadry.blog.security.SecurityUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+import javax.naming.AuthenticationException;
 import java.util.Optional;
 
 
@@ -43,9 +48,11 @@ public class UserServiceTest {
 
     UserService userService;
 
+    PasswordEncoder passwordEncoder;
     @Before
     public void setUp() throws Exception {
-     userService = new UserServiceImp(userRepository, authorityRepository, new BCryptPasswordEncoder());
+        passwordEncoder = new BCryptPasswordEncoder();
+        userService = new UserServiceImp(userRepository, authorityRepository, passwordEncoder);
     }
 
     @Test
@@ -119,5 +126,55 @@ public class UserServiceTest {
         keyAndPassword.setPassword("test-password");
 
         userService.resetPasswordFinal(keyAndPassword);
+    }
+
+    @Test
+    public void testChangePassword()  {
+        final String TEST_PASSWORD = "test-current_password";
+        final String TEST_NEW_PASSWORD = "test-new_password";
+
+        User user = new User();
+        user.setUsername("test-username");
+        user.setPassword(passwordEncoder.encode(TEST_PASSWORD));
+
+        PasswordChangedDto passwordChangedDto = new PasswordChangedDto();
+        passwordChangedDto.setCurrentPassword(TEST_PASSWORD);
+        passwordChangedDto.setNewPassword(TEST_NEW_PASSWORD);
+
+        mockStatic(SecurityUtils.class);
+        when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user));
+
+        userService.changePassword(passwordChangedDto);
+
+        verify(userRepository).save(captor.capture());
+        User passedUser = captor.getValue();
+        assertTrue(passwordEncoder.matches(TEST_NEW_PASSWORD, passedUser.getPassword()));
+    }
+
+    @Test(expected = BadCredentialsException.class)
+    public void testChangePasswordWithInvalidCurrentPassword() {
+
+        User user = new User();
+        user.setUsername("test-username");
+        user.setPassword("test-password");
+
+        PasswordChangedDto passwordChangedDto = new PasswordChangedDto();
+        passwordChangedDto.setCurrentPassword("invalid-password");
+        passwordChangedDto.setCurrentPassword("test-new_password");
+
+        mockStatic(SecurityUtils.class);
+        when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user));
+
+        userService.changePassword(passwordChangedDto);
+    }
+
+    @Test(expected = UnAuthenticatedAccessException.class)
+    public void testUnAuthenticatedAccessToChangePassword() {
+        mockStatic(SecurityUtils.class);
+        when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.empty());
+
+        userService.changePassword(new PasswordChangedDto());
     }
 }

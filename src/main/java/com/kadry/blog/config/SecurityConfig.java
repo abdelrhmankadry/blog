@@ -26,7 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic();
 
         http.csrf().disable()
                 .sessionManagement()
@@ -38,7 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/api/authenticate").permitAll()
                 .mvcMatchers("/api/account/reset-password/**").permitAll()
                 .mvcMatchers("/api/**").authenticated()
-                .and()
+        .and()
+                .httpBasic()
+        .and()
                 .apply(new JwtConfiguration(tokenProvider));
 
 

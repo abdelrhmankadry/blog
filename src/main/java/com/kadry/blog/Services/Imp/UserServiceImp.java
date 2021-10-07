@@ -5,6 +5,7 @@ import com.kadry.blog.Services.UserService;
 import com.kadry.blog.Services.exceptions.UsernameAlreadyUsedException;
 import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
 import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
+import com.kadry.blog.dto.PasswordChangedDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.mapper.UserMapper;
 import com.kadry.blog.model.Authority;
@@ -14,6 +15,9 @@ import com.kadry.blog.repositories.AuthorityRepository;
 import com.kadry.blog.repositories.UserRepository;
 import com.kadry.blog.security.AuthoritiesConstants;
 import com.kadry.blog.security.RandomUtil;
+import com.kadry.blog.security.SecurityUtils;
+import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -103,6 +107,21 @@ public class UserServiceImp implements UserService {
             userRepository.save(user);
         },
                 ()-> {throw new InvalidResetKeyException();});
+    }
+
+    @Override
+    public void changePassword(PasswordChangedDto passwordChangedDto){
+        String username = SecurityUtils.getCurrentUserLogin()
+                .orElseThrow(UnAuthenticatedAccessException::new);
+        userRepository.findUserByUsername(username).ifPresent(user -> {
+            if(passwordEncoder.matches(passwordChangedDto.getCurrentPassword(),
+                    user.getPassword())){
+                user.setPassword(passwordEncoder.encode(passwordChangedDto.getNewPassword()));
+                userRepository.save(user);
+            }else{
+                throw new BadCredentialsException("Invalid current password!");
+            }
+        });
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
