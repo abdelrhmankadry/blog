@@ -13,6 +13,7 @@ import com.kadry.blog.repositories.AuthorityRepository;
 import com.kadry.blog.repositories.UserRepository;
 import com.kadry.blog.security.SecurityUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -54,6 +55,12 @@ public class UserServiceTest {
     public void setUp() throws Exception {
         passwordEncoder = new BCryptPasswordEncoder();
         userService = new UserServiceImp(userRepository, authorityRepository, passwordEncoder);
+
+    }
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        mockStatic(SecurityUtils.class);
     }
 
     @Test
@@ -142,7 +149,7 @@ public class UserServiceTest {
         passwordChangedDto.setCurrentPassword(TEST_PASSWORD);
         passwordChangedDto.setNewPassword(TEST_NEW_PASSWORD);
 
-        mockStatic(SecurityUtils.class);
+
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user));
 
@@ -164,7 +171,7 @@ public class UserServiceTest {
         passwordChangedDto.setCurrentPassword("invalid-password");
         passwordChangedDto.setCurrentPassword("test-new_password");
 
-        mockStatic(SecurityUtils.class);
+
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user));
 
@@ -173,7 +180,6 @@ public class UserServiceTest {
 
     @Test(expected = UnAuthenticatedAccessException.class)
     public void testUnAuthenticatedAccessToChangePassword() {
-        mockStatic(SecurityUtils.class);
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.empty());
 
         userService.changePassword(new PasswordChangedDto());
@@ -181,8 +187,6 @@ public class UserServiceTest {
 
     @Test
     public void deleteUserAccount() {
-
-        mockStatic(SecurityUtils.class);
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
         userService.deleteUserAccount();
 
