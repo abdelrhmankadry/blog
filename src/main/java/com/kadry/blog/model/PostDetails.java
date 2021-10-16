@@ -6,7 +6,6 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -14,36 +13,31 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Post {
+public class PostDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_details_id")
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @MapsId
     @ToString.Exclude
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    @ToString.Exclude
-    private Category category;
+    private Post post;
 
     @NotNull
     @NotEmpty
-    private String title;
+    private String body;
 
-    @Column(name = "post_date")
-    private Date postDate;
+    @Column(name = "up_vote")
+    private int upVote = 0;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Post post = (Post) o;
+        PostDetails that = (PostDetails) o;
 
-        return Objects.equals(id, post.id);
+        return Objects.equals(id, that.id);
     }
 
     @Override

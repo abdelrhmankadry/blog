@@ -7,10 +7,7 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -21,36 +18,43 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
     @NotNull
     @Column(nullable = false)
-    String username;
+    private String username;
 
     @NotNull
     @Column(name = "password_hash", nullable = false)
-    String password;
+    private String password;
 
     @Column(name = "first_name")
-    String firstName;
+    private String firstName;
 
     @Column(name = "last_name")
-    String lastName;
+    private String lastName;
 
     @Column(unique = true)
-    String email;
+    private String email;
 
     @Column(nullable = false)
-    boolean activated = false;
+    private boolean activated = false;
 
     @Column(name = "activation_key", length = 20)
-    String activationKey;
+    private String activationKey;
 
     @Column(name = "reset_key", length = 20)
-    String resetKey;
+    private String resetKey;
 
     @Column(name = "reset_date")
-    Instant resetDate = null;
+    private Instant resetDate = null;
+
+    @ElementCollection
+    @CollectionTable(name = "favorite_categories"
+        ,joinColumns = @JoinColumn(name = "id"))
+    @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
+    private List<String> favoriteCategories = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -58,6 +62,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
     )
     @BatchSize(size = 20)
+    @ToString.Exclude
     Set<Authority> authorities = new HashSet<>();
 
     @Override
