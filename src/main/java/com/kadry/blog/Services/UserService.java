@@ -1,6 +1,7 @@
 package com.kadry.blog.Services;
 
 import com.kadry.blog.dto.PasswordChangedDto;
+import com.kadry.blog.dto.UpdateUserDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
@@ -20,4 +21,6 @@ public interface UserService {
      void changePassword(PasswordChangedDto passwordChangedDto);
 
      void deleteUserAccount();
+
+     void updateUser(UpdateUserDto updateUserDto);
 }

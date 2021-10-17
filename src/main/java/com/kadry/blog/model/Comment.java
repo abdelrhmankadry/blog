@@ -34,6 +34,8 @@ public class Comment {
 
     private String body;
 
+    private int upVotes = 0;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

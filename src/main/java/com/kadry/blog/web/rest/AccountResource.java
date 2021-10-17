@@ -3,6 +3,7 @@ package com.kadry.blog.web.rest;
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
 import com.kadry.blog.dto.PasswordChangedDto;
+import com.kadry.blog.dto.UpdateUserDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
@@ -49,8 +50,13 @@ public class AccountResource {
         userService.changePassword(passwordChangedDto);
     }
 
-    @DeleteMapping("account/delete")
+    @DeleteMapping("/account/delete")
     public void deleteUserAccount(){
         userService.deleteUserAccount();;
+    }
+
+    @PostMapping("/account/update")
+    public void updateUserAccount(@RequestBody UpdateUserDto updateUserDto){
+        userService.updateUser(updateUserDto);
     }
 }

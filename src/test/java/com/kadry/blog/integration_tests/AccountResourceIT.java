@@ -1,8 +1,10 @@
 package com.kadry.blog.integration_tests;
 
 import com.kadry.blog.dto.PasswordChangedDto;
+import com.kadry.blog.dto.UpdateUserDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.User;
+import com.kadry.blog.object_mother.UserObjectMother;
 import com.kadry.blog.payload.KeyAndPassword;
 import com.kadry.blog.repositories.UserRepository;
 import com.kadry.blog.security.AuthoritiesConstants;
@@ -22,6 +24,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static com.kadry.blog.TestUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,9 +52,11 @@ public class AccountResourceIT {
     @Autowired
     MockMvc mockMvc;
 
+    UserObjectMother userObjectMother;
     @Before
     public void setUp() throws Exception {
         testRestTemplate = new TestRestTemplate();
+        userObjectMother = new UserObjectMother();
     }
 
     @Test
@@ -84,9 +90,8 @@ public class AccountResourceIT {
         mockMvc.perform(get("/api/activate?key={activationKey}", TEST_ACTIVATION_KEY))
                 .andExpect(status().isOk());
 
-        userRepository.findUserByUsername(TEST_USERNAME).ifPresent(returnedUser -> {
-            assertTrue(returnedUser.isActivated());
-        });
+        User returnedUser = userRepository.findUserByUsername(TEST_USERNAME).get();
+        assertTrue(returnedUser.isActivated());
     }
 
     @Test
@@ -160,5 +165,36 @@ public class AccountResourceIT {
                 .andExpect(status().isOk());
 
         assertNull(userRepository.findUserByUsername(TEST_USERNAME).orElse(null));
+    }
+
+    @Test
+    @WithMockUser(UserObjectMother.TEST_USERNAME)
+    public void updateUserAccount() throws Exception {
+        User user = userObjectMother.createDefaultUser();
+
+        userRepository.save(user);
+
+        UpdateUserDto updateUserDto = new UpdateUserDto();
+        updateUserDto.setFirstName("test-new-firstname");
+        updateUserDto.setLastName("test-new-lastname");
+        updateUserDto.setFavoriteCategories(List.of("test-new-category1", "test-new-category2"));
+
+        mockMvc.perform(post("/api/account/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(updateUserDto)))
+                        .andExpect(status().isOk());
+
+        User updatedUser = userRepository.findUserWithFavoriteCategoriesByUsername(user.getUsername()).get();
+
+        assertEquals(updateUserDto.getFirstName(),
+                updatedUser.getFirstName());
+
+        assertEquals(updateUserDto.getLastName(),
+                updatedUser.getLastName());
+
+
+        assertEquals(updateUserDto.getFavoriteCategories().size(),
+                updatedUser.getFavoriteCategories().size());
+
     }
 }

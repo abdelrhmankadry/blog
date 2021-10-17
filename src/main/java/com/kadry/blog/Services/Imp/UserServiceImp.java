@@ -6,6 +6,7 @@ import com.kadry.blog.Services.exceptions.UsernameAlreadyUsedException;
 import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
 import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.dto.PasswordChangedDto;
+import com.kadry.blog.dto.UpdateUserDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.mapper.UserMapper;
 import com.kadry.blog.model.Authority;
@@ -19,6 +20,7 @@ import com.kadry.blog.security.SecurityUtils;
 import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +134,22 @@ public class UserServiceImp implements UserService {
         String currentUsername = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(UnAuthenticatedAccessException::new);
         userRepository.deleteUserByUsername(currentUsername);
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(UpdateUserDto updateUserDto) {
+        String currentUsername = SecurityUtils.getCurrentUserLogin()
+                .orElseThrow(UnAuthenticatedAccessException::new);
+
+        User user = userRepository.findUserWithFavoriteCategoriesByUsername(currentUsername)
+                    .orElseThrow(()-> new UsernameNotFoundException("User not found!!"));
+
+        user.setFirstName(updateUserDto.getFirstName());
+        user.setLastName(updateUserDto.getLastName());
+        user.setFavoriteCategories(updateUserDto.getFavoriteCategories());
+
+        userRepository.save(user);
     }
 
     private boolean removeNonActivatedUser(User existingUser) {

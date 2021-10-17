@@ -5,6 +5,7 @@ import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.Services.Imp.UserServiceImp;
 import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import com.kadry.blog.dto.PasswordChangedDto;
+import com.kadry.blog.dto.UpdateUserDto;
 import com.kadry.blog.dto.UserDto;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
@@ -21,8 +22,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -194,5 +197,28 @@ public class UserServiceTest {
 
         assertEquals("test-username", stringCaptor.getValue());
 
+    }
+
+    @Test
+    public void updateUserAccount() {
+        when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
+        when(userRepository.findUserWithFavoriteCategoriesByUsername(any())).thenReturn(Optional.of(new User()));
+        UpdateUserDto updateUserDto = getUpdateUserDto();
+
+        userService.updateUser(updateUserDto);
+
+        verify(userRepository).save(userCaptor.capture());
+        User updatedUser = userCaptor.getValue();
+        assertEquals(updateUserDto.getFirstName(), updatedUser.getFirstName());
+        assertEquals(updateUserDto.getLastName(), updatedUser.getLastName());
+        assertEquals(updateUserDto.getFavoriteCategories().size(), updatedUser.getFavoriteCategories().size());
+    }
+
+    private UpdateUserDto getUpdateUserDto() {
+        UpdateUserDto updateUserDto = new UpdateUserDto();
+        updateUserDto.setFirstName("test-new-firstname");
+        updateUserDto.setLastName("test-new-lastname");
+        updateUserDto.setFavoriteCategories(List.of("new-category1", "new-category2"));
+        return updateUserDto;
     }
 }
