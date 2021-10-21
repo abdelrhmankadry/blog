@@ -1,4 +1,4 @@
-package com.kadry.blog.dto;
+package com.kadry.blog.dto.user;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

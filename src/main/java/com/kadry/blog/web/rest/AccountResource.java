@@ -2,9 +2,9 @@ package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
-import com.kadry.blog.dto.PasswordChangedDto;
-import com.kadry.blog.dto.UpdateUserDto;
-import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.dto.user.PasswordChangedDto;
+import com.kadry.blog.dto.user.UpdateUserDto;
+import com.kadry.blog.dto.user.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
 import org.springframework.http.HttpStatus;

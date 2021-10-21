@@ -5,9 +5,9 @@ import com.kadry.blog.Services.UserService;
 import com.kadry.blog.Services.exceptions.UsernameAlreadyUsedException;
 import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
 import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
-import com.kadry.blog.dto.PasswordChangedDto;
-import com.kadry.blog.dto.UpdateUserDto;
-import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.dto.user.PasswordChangedDto;
+import com.kadry.blog.dto.user.UpdateUserDto;
+import com.kadry.blog.dto.user.UserDto;
 import com.kadry.blog.mapper.UserMapper;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
@@ -19,7 +19,6 @@ import com.kadry.blog.security.RandomUtil;
 import com.kadry.blog.security.SecurityUtils;
 import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -142,7 +141,7 @@ public class UserServiceImp implements UserService {
         String currentUsername = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(UnAuthenticatedAccessException::new);
 
-        User user = userRepository.findUserWithFavoriteCategoriesByUsername(currentUsername)
+        User user = userRepository.findUserByUsername(currentUsername)
                     .orElseThrow(()-> new UsernameNotFoundException("User not found!!"));
 
         user.setFirstName(updateUserDto.getFirstName());

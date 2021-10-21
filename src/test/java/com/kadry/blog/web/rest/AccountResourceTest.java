@@ -2,23 +2,19 @@ package com.kadry.blog.web.rest;
 
 import com.kadry.blog.Services.MailService;
 import com.kadry.blog.Services.UserService;
-import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
-import com.kadry.blog.dto.PasswordChangedDto;
-import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.dto.user.PasswordChangedDto;
+import com.kadry.blog.dto.user.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
-import com.kadry.blog.security.AuthoritiesConstants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 

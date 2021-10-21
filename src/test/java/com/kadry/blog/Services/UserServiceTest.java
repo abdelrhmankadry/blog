@@ -4,9 +4,9 @@ import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
 import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
 import com.kadry.blog.Services.Imp.UserServiceImp;
 import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
-import com.kadry.blog.dto.PasswordChangedDto;
-import com.kadry.blog.dto.UpdateUserDto;
-import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.dto.user.PasswordChangedDto;
+import com.kadry.blog.dto.user.UpdateUserDto;
+import com.kadry.blog.dto.user.UserDto;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.model.User;
 import com.kadry.blog.payload.KeyAndPassword;
@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 
 
 import java.util.List;
@@ -202,7 +201,7 @@ public class UserServiceTest {
     @Test
     public void updateUserAccount() {
         when(SecurityUtils.getCurrentUserLogin()).thenReturn(Optional.of("test-username"));
-        when(userRepository.findUserWithFavoriteCategoriesByUsername(any())).thenReturn(Optional.of(new User()));
+        when(userRepository.findUserByUsername(any())).thenReturn(Optional.of(new User()));
         UpdateUserDto updateUserDto = getUpdateUserDto();
 
         userService.updateUser(updateUserDto);

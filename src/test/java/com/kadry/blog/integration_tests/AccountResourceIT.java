@@ -1,8 +1,8 @@
 package com.kadry.blog.integration_tests;
 
-import com.kadry.blog.dto.PasswordChangedDto;
-import com.kadry.blog.dto.UpdateUserDto;
-import com.kadry.blog.dto.UserDto;
+import com.kadry.blog.dto.user.PasswordChangedDto;
+import com.kadry.blog.dto.user.UpdateUserDto;
+import com.kadry.blog.dto.user.UserDto;
 import com.kadry.blog.model.User;
 import com.kadry.blog.object_mother.UserObjectMother;
 import com.kadry.blog.payload.KeyAndPassword;
@@ -16,8 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -184,7 +182,7 @@ public class AccountResourceIT {
                         .content(asJsonString(updateUserDto)))
                         .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findUserWithFavoriteCategoriesByUsername(user.getUsername()).get();
+        User updatedUser = userRepository.findWithFetchUserByUsername(user.getUsername()).get();
 
         assertEquals(updateUserDto.getFirstName(),
                 updatedUser.getFirstName());

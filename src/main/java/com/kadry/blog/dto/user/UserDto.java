@@ -1,4 +1,4 @@
-package com.kadry.blog.dto;
+package com.kadry.blog.dto.user;
 
 import com.kadry.blog.config.Constants;
 import lombok.Builder;

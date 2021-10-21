@@ -18,7 +18,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             "FROM User u " +
             "JOIN FETCH u.favoriteCategories " +
             "WHERE u.username = :username")
-    Optional<User> findUserWithFavoriteCategoriesByUsername(@Param("username") String username);
+    Optional<User> findWithFetchUserByUsername(@Param("username") String username);
 
     Optional<User> findUserByEmail(String email);
 

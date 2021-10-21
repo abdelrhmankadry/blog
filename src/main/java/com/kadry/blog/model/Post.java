@@ -2,6 +2,7 @@ package com.kadry.blog.model;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -20,6 +21,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NaturalId
+    private String uuid;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @ToString.Exclude
@@ -36,6 +40,13 @@ public class Post {
 
     @Column(name = "post_date")
     private Date postDate;
+
+    @NotNull
+    @NotEmpty
+    private String body;
+
+    @Column(name = "up_vote")
+    private int upVote = 0;
 
     @Override
     public boolean equals(Object o) {
