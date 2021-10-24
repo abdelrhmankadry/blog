@@ -1,4 +1,4 @@
-package com.kadry.blog.Services.exceptions;
+package com.kadry.blog.Services.exceptions.user;
 
 import org.springframework.security.core.AuthenticationException;
 

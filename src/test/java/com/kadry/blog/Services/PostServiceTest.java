@@ -3,16 +3,16 @@ package com.kadry.blog.Services;
 import com.kadry.blog.Services.Imp.PostServiceImpl;
 import com.kadry.blog.dto.post.CreatePostResponse;
 import com.kadry.blog.dto.post.PostDto;
+import com.kadry.blog.dto.post.UpdatePostDto;
 import com.kadry.blog.mapper.PostDtoToPost;
 import com.kadry.blog.model.Category;
 import com.kadry.blog.model.Post;
 import com.kadry.blog.model.User;
-import com.kadry.blog.object_mother.PostObjectMother;
+import com.kadry.blog.object_mother.PostDtoObjectMother;
 import com.kadry.blog.object_mother.UserObjectMother;
 import com.kadry.blog.repositories.CategoryRepository;
 import com.kadry.blog.repositories.PostRepository;
 import com.kadry.blog.repositories.UserRepository;
-import com.kadry.blog.security.SecurityUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class PostServiceTest {
 
     PostService postService;
-    PostObjectMother postObjectMother;
+    PostDtoObjectMother postDtoObjectMother;
 
     @Mock
     PostRepository postRepository;
@@ -50,8 +51,8 @@ public class PostServiceTest {
     @Before
     public void setUp() throws Exception {
         postDtoToPost = new PostDtoToPost(categoryRepository, userRepository);
-        postService = new PostServiceImpl(postRepository, userRepository, postDtoToPost);
-        postObjectMother = new PostObjectMother();
+        postService = new PostServiceImpl(postRepository, userRepository, postDtoToPost, categoryRepository);
+        postDtoObjectMother = new PostDtoObjectMother();
     }
 
     @Test
@@ -59,7 +60,7 @@ public class PostServiceTest {
         when(userRepository.findUserByUsername(any())).thenReturn(Optional.of(new User()));
         when(categoryRepository.findCategoryByName(any())).thenReturn(Optional.of(new Category()));
 
-        PostDto postDto = postObjectMother.createDefaultPostDto();
+        PostDto postDto = postDtoObjectMother.createDefaultPostDto();
 
         CreatePostResponse createPostResponse = postService.createPost(postDto, UserObjectMother.TEST_USERNAME);
 
@@ -67,8 +68,29 @@ public class PostServiceTest {
         assertNotNull(createPostResponse.getCreatedPostId());
 
         Post post = postCaptor.getValue();
-        assertEquals(PostObjectMother.TEST_TITLE, post.getTitle());
+        assertEquals(PostDtoObjectMother.TEST_TITLE, post.getTitle());
         assertNotNull(post.getUser());
         assertNotNull(post.getCategory());
+    }
+
+    @Test
+    public void testUpdatePost() {
+        when(postRepository.findPostByUuid(anyString())).thenReturn(Optional.of(new Post()));
+
+        Category category = new Category();
+        category.setName("test-new-category");
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
+
+        UpdatePostDto updatePostDto = new UpdatePostDto();
+        updatePostDto.setBody("test-new-body");
+        updatePostDto.setCategory("test-new-category");
+
+        postService.updatePost(updatePostDto, UUID.randomUUID().toString());
+
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+
+        assertEquals(updatePostDto.getBody(), savedPost.getBody());
+        assertEquals(updatePostDto.getCategory(), savedPost.getCategory().getName());
     }
 }

@@ -1,12 +1,10 @@
 package com.kadry.blog.mapper;
 
 
-import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
 import com.kadry.blog.dto.post.PostDto;
 import com.kadry.blog.model.Post;
 import com.kadry.blog.repositories.CategoryRepository;
 import com.kadry.blog.repositories.UserRepository;
-import com.kadry.blog.security.SecurityUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

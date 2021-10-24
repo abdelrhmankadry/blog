@@ -1,10 +1,10 @@
 package com.kadry.blog.Services.Imp;
 
-import com.kadry.blog.Services.exceptions.EmailAlreadyUsedException;
+import com.kadry.blog.Services.exceptions.user.EmailAlreadyUsedException;
 import com.kadry.blog.Services.UserService;
-import com.kadry.blog.Services.exceptions.UsernameAlreadyUsedException;
-import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
-import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
+import com.kadry.blog.Services.exceptions.user.UsernameAlreadyUsedException;
+import com.kadry.blog.Services.exceptions.user.InvalidActivationKeyException;
+import com.kadry.blog.Services.exceptions.user.InvalidResetKeyException;
 import com.kadry.blog.dto.user.PasswordChangedDto;
 import com.kadry.blog.dto.user.UpdateUserDto;
 import com.kadry.blog.dto.user.UserDto;
@@ -17,7 +17,7 @@ import com.kadry.blog.repositories.UserRepository;
 import com.kadry.blog.security.AuthoritiesConstants;
 import com.kadry.blog.security.RandomUtil;
 import com.kadry.blog.security.SecurityUtils;
-import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
+import com.kadry.blog.Services.exceptions.user.UnAuthenticatedAccessException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,4 +1,4 @@
-package com.kadry.blog.Services.exceptions;
+package com.kadry.blog.Services.exceptions.user;
 
 public class InvalidResetKeyException extends RuntimeException {
     public InvalidResetKeyException() {

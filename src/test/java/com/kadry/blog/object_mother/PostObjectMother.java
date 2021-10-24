@@ -1,23 +1,26 @@
 package com.kadry.blog.object_mother;
 
-import com.kadry.blog.dto.post.PostDto;
+import com.kadry.blog.model.Category;
+import com.kadry.blog.model.Post;
+import com.kadry.blog.model.User;
 
 import java.util.Date;
-
+import java.util.UUID;
 
 public class PostObjectMother {
+    private final UserObjectMother userObjectMother;
 
-    public static final String TEST_TITLE = "test-title";
-    public static final String TEST_BODY = "test-body";
-    public static final String TEST_CATEGORY = "test-category";
-    public static final Date TEST_DATE = new Date();
+    public PostObjectMother() {
+        this.userObjectMother = new UserObjectMother();
+    }
 
-    public PostDto createDefaultPostDto(){
-        PostDto postDto = new PostDto();
-        postDto.setTitle(TEST_TITLE);
-        postDto.setBody(TEST_BODY);
-        postDto.setDate(TEST_DATE);
-        postDto.setCategory(TEST_CATEGORY);
-        return postDto;
+    public Post createDefaultPost(){
+        Post post = new Post();
+        post.setUuid(UUID.randomUUID().toString());
+        post.setTitle("test-title");
+        post.setBody("test-body");
+        post.setPostDate(new Date());
+//        post.setUser(userObjectMother.createDefaultUser());
+        return post;
     }
 }

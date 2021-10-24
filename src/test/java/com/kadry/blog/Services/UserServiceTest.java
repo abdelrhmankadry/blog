@@ -1,9 +1,9 @@
 package com.kadry.blog.Services;
 
-import com.kadry.blog.Services.exceptions.InvalidActivationKeyException;
-import com.kadry.blog.Services.exceptions.InvalidResetKeyException;
+import com.kadry.blog.Services.exceptions.user.InvalidActivationKeyException;
+import com.kadry.blog.Services.exceptions.user.InvalidResetKeyException;
 import com.kadry.blog.Services.Imp.UserServiceImp;
-import com.kadry.blog.Services.exceptions.UnAuthenticatedAccessException;
+import com.kadry.blog.Services.exceptions.user.UnAuthenticatedAccessException;
 import com.kadry.blog.dto.user.PasswordChangedDto;
 import com.kadry.blog.dto.user.UpdateUserDto;
 import com.kadry.blog.dto.user.UserDto;

@@ -1,6 +1,6 @@
 package com.kadry.blog.security;
 
-import com.kadry.blog.Services.exceptions.UnActivatedUserException;
+import com.kadry.blog.Services.exceptions.user.UnActivatedUserException;
 import com.kadry.blog.model.Authority;
 import com.kadry.blog.repositories.UserRepository;
 import org.junit.Before;
