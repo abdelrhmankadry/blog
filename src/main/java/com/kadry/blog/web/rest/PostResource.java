@@ -26,4 +26,9 @@ public class PostResource {
     public void updatePost(@RequestBody UpdatePostDto updatePostDto, @RequestParam(name = "post_id") String uuid){
         postService.updatePost(updatePostDto, uuid);
     }
+
+    @DeleteMapping("/delete")
+    public void deletePost(@RequestParam(name = "post_id") String uuid){
+        postService.deletePost(uuid);
+    }
 }

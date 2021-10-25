@@ -9,4 +9,6 @@ public interface PostService {
     CreatePostResponse createPost(PostDto postDto, String username);
 
     void updatePost(UpdatePostDto updatePostDto, String uuid);
+
+    void deletePost(String uuid);
 }

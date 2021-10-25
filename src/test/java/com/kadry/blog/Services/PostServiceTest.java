@@ -60,7 +60,7 @@ public class PostServiceTest {
         when(userRepository.findUserByUsername(any())).thenReturn(Optional.of(new User()));
         when(categoryRepository.findCategoryByName(any())).thenReturn(Optional.of(new Category()));
 
-        PostDto postDto = postDtoObjectMother.createDefaultPostDto();
+        PostDto postDto = postDtoObjectMother.createDefaultPostDto().get();
 
         CreatePostResponse createPostResponse = postService.createPost(postDto, UserObjectMother.TEST_USERNAME);
 
@@ -76,21 +76,35 @@ public class PostServiceTest {
     @Test
     public void testUpdatePost() {
         when(postRepository.findPostByUuid(anyString())).thenReturn(Optional.of(new Post()));
-
-        Category category = new Category();
-        category.setName("test-new-category");
+        Category category = createCategory();
         when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
-
-        UpdatePostDto updatePostDto = new UpdatePostDto();
-        updatePostDto.setBody("test-new-body");
-        updatePostDto.setCategory("test-new-category");
+        UpdatePostDto updatePostDto = createUpdatePostDto();
 
         postService.updatePost(updatePostDto, UUID.randomUUID().toString());
 
         verify(postRepository).save(postCaptor.capture());
         Post savedPost = postCaptor.getValue();
-
         assertEquals(updatePostDto.getBody(), savedPost.getBody());
         assertEquals(updatePostDto.getCategory(), savedPost.getCategory().getName());
+    }
+
+    @Test
+    public void testDeletePost() {
+        when(postRepository.findPostByUuid(any())).thenReturn(Optional.of(new Post()));
+        postService.deletePost("test-uuid");
+        verify(postRepository).delete(any());
+    }
+
+    private Category createCategory() {
+        Category category = new Category();
+        category.setName("test-new-category");
+        return category;
+    }
+
+    private UpdatePostDto createUpdatePostDto() {
+        UpdatePostDto updatePostDto = new UpdatePostDto();
+        updatePostDto.setBody("test-new-body");
+        updatePostDto.setCategory("test-new-category");
+        return updatePostDto;
     }
 }

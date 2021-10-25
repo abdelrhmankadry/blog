@@ -12,12 +12,18 @@ public class PostDtoObjectMother {
     public static final String TEST_CATEGORY = "test-category";
     public static final Date TEST_DATE = new Date();
 
-    public PostDto createDefaultPostDto(){
-        PostDto postDto = new PostDto();
+    private PostDto postDto;
+
+    public PostDtoObjectMother createDefaultPostDto(){
+        postDto = new PostDto();
         postDto.setTitle(TEST_TITLE);
         postDto.setBody(TEST_BODY);
         postDto.setDate(TEST_DATE);
         postDto.setCategory(TEST_CATEGORY);
+        return this;
+    }
+
+    public PostDto get(){
         return postDto;
     }
 }

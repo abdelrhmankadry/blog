@@ -4,6 +4,7 @@ import com.kadry.blog.dto.post.PostDto;
 import com.kadry.blog.dto.post.UpdatePostDto;
 import com.kadry.blog.model.Category;
 import com.kadry.blog.model.Post;
+import com.kadry.blog.object_mother.PostDtoObjectMother;
 import com.kadry.blog.object_mother.PostObjectMother;
 import com.kadry.blog.object_mother.UserObjectMother;
 import com.kadry.blog.repositories.CategoryRepository;
@@ -23,8 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 
 import static com.kadry.blog.TestUtils.asJsonString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,21 +46,19 @@ public class PostResourceIT {
     private CategoryRepository categoryRepository;
 
     private PostObjectMother postObjectMother;
+    private PostDtoObjectMother postDtoObjectMother;
 
     @Before
     public void setUp() throws Exception {
         postObjectMother = new PostObjectMother();
+        postDtoObjectMother = new PostDtoObjectMother();
 
     }
 
     @Test
     @WithMockUser(UserObjectMother.TEST_USERNAME)
     public void testCreatePost() throws Exception {
-        PostDto postDto = new PostDto();
-        postDto.setTitle("test-title");
-        postDto.setCategory("test-category");
-        postDto.setDate((new Date()));
-        postDto.setBody("test-body");
+        PostDto postDto = postDtoObjectMother.createDefaultPostDto().get();
 
         mockMvc.perform(post("/api/post/create")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +66,7 @@ public class PostResourceIT {
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.created_post_id").exists());
 
-        assertTrue(postRepository.findPostByTitle("test-title").isPresent());
+        assertTrue(postRepository.findPostByTitle(postDto.getTitle()).isPresent());
 
     }
 
@@ -77,30 +75,49 @@ public class PostResourceIT {
     public void testUpdatePost() throws Exception {
 
         persistTestCategory();
-        Post post = persistTestPost();
-
-        UpdatePostDto updatePostDto = new UpdatePostDto();
-        updatePostDto.setBody("test-new-body");
-        updatePostDto.setCategory("test-new-category");
+        String postUuid = persistTestPost();
+        UpdatePostDto updatePostDto = createUpdatePostDto();
 
         mockMvc.perform(post("/api/post/update")
-                            .param("post_id", post.getUuid())
+                            .param("post_id", postUuid)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(asJsonString(updatePostDto)))
                 .andExpect(status().isOk());
 
-        Post returnedPost = postRepository.findEagerlyPostByUuid(post.getUuid()).get();
+        Post updatedPost = postRepository.findEagerlyPostByUuid(postUuid).get();
+        assertEquals(updatePostDto.getBody(), updatedPost.getBody());
+        assertEquals(updatePostDto.getCategory(), updatedPost.getCategory().getName());
+    }
 
-        assertEquals(updatePostDto.getBody(), returnedPost.getBody());
-        assertEquals(updatePostDto.getCategory(), returnedPost.getCategory().getName());
+    @Test
+    @WithMockUser(UserObjectMother.TEST_USERNAME)
+    public void testDeletePost() throws Exception {
+        Post post = postObjectMother.createDefaultPost().get();
+        postRepository.save(post);
+
+        mockMvc.perform(delete("/api/post/delete")
+                                .param("post_id", post.getUuid()))
+                .andExpect(status().isOk());
+
+        assertFalse(postRepository.findPostByUuid(post.getUuid()).isPresent());
+    }
+
+    private UpdatePostDto createUpdatePostDto() {
+        UpdatePostDto updatePostDto = new UpdatePostDto();
+        updatePostDto.setBody("test-new-body");
+        updatePostDto.setCategory("test-new-category");
+        return updatePostDto;
     }
 
 
-    private Post persistTestPost() {
-        Post post = postObjectMother.createDefaultPost();
-        post.setCategory(categoryRepository.findCategoryByName(TEST_UPDATE_CATEGORY).get());
+    private String persistTestPost() {
+        Post post = postObjectMother
+                .createDefaultPost()
+                .category(categoryRepository.
+                        findCategoryByName(TEST_UPDATE_CATEGORY).get())
+                .get();
         postRepository.save(post);
-        return post;
+        return post.getUuid();
     }
 
     private void persistTestCategory() {
