@@ -22,7 +22,7 @@ This is a Java Spring Boot project that provides a REST API for a blog applicati
 1. Clone the repository:
 
 ```
-git clone https://github.com/yourusername/blog-rest-api.git
+git clone https://github.com/abdelrhmankadry/blog.git
 ```
 
 2. Navigate to the project directory:
@@ -44,6 +44,9 @@ mvn clean install
 ```
 mvn spring-boot:run
 ```
+## GitHub Actions
+
+This project includes a GitHub Actions workflow for continuous integration. The workflow is defined in the `.github/workflows/ci.yml`. This workflow is triggered on push or pull request events for the main branch and can also be run manually from the Actions tab. It uploads code coverage reports to Codecov using the `codecov/codecov-action@v1` action.
 
 The REST API will be available at `http://localhost:8080`.
 
