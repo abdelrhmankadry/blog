@@ -44,9 +44,12 @@ mvn clean install
 ```
 mvn spring-boot:run
 ```
+
+The REST API will be available at `http://localhost:8080`.
+
 ## GitHub Actions
 
 This project includes a GitHub Actions workflow for continuous integration. The workflow is defined in the `.github/workflows/ci.yml`. This workflow is triggered on push or pull request events for the main branch and can also be run manually from the Actions tab. It uploads code coverage reports to Codecov using the `codecov/codecov-action@v1` action.
 
-The REST API will be available at `http://localhost:8080`.
+
 
